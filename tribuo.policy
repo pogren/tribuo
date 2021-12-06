@@ -1,0 +1,15 @@
+grant codeBase "file:/Users/apocock/Development/Tribuo/Clustering/KMeans/target/test-classes" {
+        permission java.lang.RuntimePermission "modifyThread";
+//        permission java.lang.RuntimePermission "modifyThreadGroup";
+};
+
+grant codeBase "file:/Users/apocock/Development/Tribuo/Clustering/KMeans/target/tribuo-clustering-kmeans-4.2.0-SNAPSHOT-jar-with-dependencies.jar" {
+        permission java.lang.RuntimePermission "modifyThread";
+        permission java.lang.RuntimePermission "modifyThreadGroup";
+        permission java.lang.RuntimePermission "accessDeclaredMembers";
+        permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+        permission java.util.logging.LoggingPermission "control";
+        permission java.io.FilePermission "<<ALL FILES>>", "read";
+        permission java.util.PropertyPermission "*", "read,write";
+};
+
