@@ -1,6 +1,7 @@
 package org.tribuo.neighbours;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.tribuo.DataSource;
 import org.tribuo.Dataset;
@@ -32,7 +33,7 @@ public class TestNeighboursPerf {
         logger.setLevel(Level.INFO);
     }
 
-    private SGDVector[] getVectors(int numSamples, long seed) {
+    private static SGDVector[] getVectors(int numSamples, long seed) {
         DataSource<ClusterID> dataSource = new GaussianClusterDataSource(numSamples, seed);
         Dataset<ClusterID> dataset = new MutableDataset<>(dataSource);
 
@@ -46,7 +47,7 @@ public class TestNeighboursPerf {
         return vectors;
     }
 
-    private void executeQuery(NeighboursQuery nq, int k) {
+    private static void executeQuery(NeighboursQuery nq, int k) {
         long startTime = System.currentTimeMillis();
         nq.queryAll(k);
         long endTime = System.currentTimeMillis();
@@ -54,7 +55,7 @@ public class TestNeighboursPerf {
         logger.info("");
     }
 
-    private void doTestIteration(NeighboursBruteForceFactory nbfFactory, NeighboursBruteForceNaiveFactory nbfnFactory) {
+    private static void doTestIteration(NeighboursBruteForceFactory nbfFactory, NeighboursBruteForceNaiveFactory nbfnFactory) {
         SGDVector[] data = getVectors(20000, 1L);
 
         logger.info("Target implementation: small dataset, small k");
@@ -136,7 +137,8 @@ public class TestNeighboursPerf {
         ////
     }
 
-    //@Test
+    @Disabled
+    @Test
     public void testSingleThreadedQueries() {
         NeighboursBruteForceFactory nbfFactory = new NeighboursBruteForceFactory(DistanceType.L2, 1);
         NeighboursBruteForceNaiveFactory nbfnFactory = new NeighboursBruteForceNaiveFactory(DistanceType.L2, 1);
@@ -146,10 +148,11 @@ public class TestNeighboursPerf {
         doTestIteration(nbfFactory, nbfnFactory);
     }
 
-    //@Test
+    @Disabled
+    @Test
     public void testMultiThreadQueries() {
-        NeighboursBruteForceFactory nbfFactory = new NeighboursBruteForceFactory(DistanceType.L2, 4);
-        NeighboursBruteForceNaiveFactory nbfnFactory = new NeighboursBruteForceNaiveFactory(DistanceType.L2, 4);
+        NeighboursBruteForceFactory nbfFactory = new NeighboursBruteForceFactory(DistanceType.L2, 2);
+        NeighboursBruteForceNaiveFactory nbfnFactory = new NeighboursBruteForceNaiveFactory(DistanceType.L2, 2);
 
         logger.info("PERFORMING MULTI-THREADED TESTS...");
         logger.info("");
