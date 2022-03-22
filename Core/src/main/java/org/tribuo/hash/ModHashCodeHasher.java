@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015-2022, Oracle and/or its affiliates. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,16 @@
 
 package org.tribuo.hash;
 
+import com.google.protobuf.Any;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.oracle.labs.mlrg.olcut.config.Config;
 import com.oracle.labs.mlrg.olcut.provenance.ConfiguredObjectProvenance;
 import com.oracle.labs.mlrg.olcut.provenance.ObjectProvenance;
 import com.oracle.labs.mlrg.olcut.provenance.Provenance;
 import com.oracle.labs.mlrg.olcut.provenance.primitives.IntProvenance;
 import com.oracle.labs.mlrg.olcut.provenance.primitives.StringProvenance;
+import org.tribuo.protos.core.HasherProto;
+import org.tribuo.protos.core.ModHashCodeHasherProto;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -70,6 +74,21 @@ public final class ModHashCodeHasher extends Hasher {
     }
 
     /**
+     * Deserialization constructor.
+     * @param version The version number.
+     * @param className The class name.
+     * @param message The serialized data.
+     * @throws InvalidProtocolBufferException If the message cannot be parsed by {@link ModHashCodeHasherProto}.
+     */
+    public static ModHashCodeHasher deserializeFromProto(int version, String className, Any message) throws InvalidProtocolBufferException {
+        ModHashCodeHasherProto proto = message.unpack(ModHashCodeHasherProto.class);
+        ModHashCodeHasher obj = new ModHashCodeHasher();
+        obj.dimension = proto.getDimension();
+        obj.postConfig();
+        return obj;
+    }
+
+    /**
      * Used by the OLCUT configuration system, and should not be called by external code.
      */
     @Override
@@ -103,6 +122,15 @@ public final class ModHashCodeHasher extends Hasher {
     @Override
     public String toString() {
         return "ModHashCodeHasher(dimension=" + dimension + ")";
+    }
+
+    @Override
+    public HasherProto serialize() {
+        HasherProto.Builder builder = HasherProto.newBuilder();
+        builder.setVersion(0);
+        builder.setClassName(this.getClass().getName());
+        builder.setSerializedData(Any.pack(ModHashCodeHasherProto.newBuilder().setDimension(dimension).build()));
+        return builder.build();
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {

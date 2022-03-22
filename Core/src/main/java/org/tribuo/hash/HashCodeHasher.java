@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015-2022, Oracle and/or its affiliates. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 
 package org.tribuo.hash;
 
+import com.google.protobuf.Any;
 import com.oracle.labs.mlrg.olcut.config.Config;
 import com.oracle.labs.mlrg.olcut.provenance.ConfiguredObjectProvenance;
 import com.oracle.labs.mlrg.olcut.provenance.Provenance;
 import com.oracle.labs.mlrg.olcut.provenance.primitives.StringProvenance;
+import org.tribuo.protos.core.HasherProto;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -48,6 +50,16 @@ public final class HashCodeHasher extends Hasher {
      */
     public HashCodeHasher(String salt) {
         this.salt = salt;
+    }
+
+    /**
+     * Deserialization factory.
+     * @param version The serialized object version.
+     * @param className The class name.
+     * @param message The serialized data.
+     */
+    public static HashCodeHasher deserializeFromProto(int version, String className, Any message) {
+        return new HashCodeHasher();
     }
 
     @Override
@@ -81,6 +93,14 @@ public final class HashCodeHasher extends Hasher {
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         salt = null;
+    }
+
+    @Override
+    public HasherProto serialize() {
+        HasherProto.Builder builder = HasherProto.newBuilder();
+        builder.setVersion(0);
+        builder.setClassName(this.getClass().getName());
+        return builder.build();
     }
 
     /**
