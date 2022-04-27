@@ -406,97 +406,89 @@ public final class ProtoUtil {
 
     public static <S extends Message, SD extends Message, PS extends ProtoSerializable<S, SD>> 
         S serialize(PS protoSerializable) {
-        return null;
-//        try {
-//            
-////            protoSerializable.getClass().getT
-////            TypeVariable<?>[] typeParameters = protoSerializable.getClass().getActualTypeParameters();
-//            
-//            
-//            ProtobufClass annotation = protoSerializable.getClass().getAnnotation(ProtobufClass.class);
-//            if (annotation == null) {
-//                throw new IllegalArgumentException(
-//                        "instance of ProtoSerializable must be annotated with @ProtobufClass to be serialized with ProtoUtil.serialize()");
-//            }
-//
-//            Class<S> serializedClass = (Class<S>) annotation.serializedClass();
-//            Message.Builder serializedClassBuilder = (Message.Builder) serializedClass.getMethod("newBuilder").invoke(null);
-//            Class<? extends Message.Builder> serializedClassBuilderClass = serializedClassBuilder.getClass();
-//            serializedClassBuilderClass.getMethod("setVersion", Integer.TYPE).invoke(serializedClassBuilder, annotation.version());
-//            serializedClassBuilderClass.getMethod("setClassName", String.class).invoke(serializedClassBuilder, protoSerializable.getClass().getName());
-//            Class<? extends Message> serializedData = annotation.serializedData();
-//            //TODO what is the correct check here?
-//            if (serializedData != null) {
-//                
-//            }
-//
-//        } catch(InvocationTargetException e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            List<Class<?>> typeParameterTypes = getTypeParameterTypes(ProtoSerializable.class, protoSerializable.getClass());
+            
+            ProtobufClass annotation = protoSerializable.getClass().getAnnotation(ProtobufClass.class);
+            int version = 0;
+            if (annotation != null) {
+                version = annotation.version();
+            }
+
+            Class<S> serializedClass = (Class<S>) typeParameterTypes.get(0);
+            S.Builder serializedClassBuilder = (S.Builder) serializedClass.getMethod("newBuilder").invoke(null);
+            Class<S.Builder> serializedClassBuilderClass = (Class<S.Builder>) serializedClassBuilder.getClass();
+            serializedClassBuilderClass.getMethod("setVersion", Integer.TYPE).invoke(serializedClassBuilder, version);
+            serializedClassBuilderClass.getMethod("setClassName", String.class).invoke(serializedClassBuilder, protoSerializable.getClass().getName());
+            SD.Builder serializedDataBuilder = protoSerializable.subserialize();
+            serializedClassBuilderClass.getMethod("setSerializedData", com.google.protobuf.Any.class).invoke(serializedClassBuilder, Any.pack(serializedDataBuilder.build()));      
+            return (S) serializedClassBuilder.build();
+        } catch(InvocationTargetException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     public static <S extends Message, SD extends Message, B extends SD.Builder, PS extends ProtoSerializable<S, SD>>  
          B subserialize(PS protoSerializable) {
-            return null;
-//                Message.Builder serializedDataBuilder = (Message.Builder) serializedData.getMethod("newBuilder").invoke(null);
-//                Class<? extends Message.Builder> serializedDataBuilderClass = serializedDataBuilder.getClass();
-//
-//                for (Field field : getFields(protoSerializable.getClass())) {
-//                    ProtobufField protobufField = field.getAnnotation(ProtobufField.class);
-//                    String fieldName = protobufField.name();
-//                    if (fieldName.equals(ProtobufField.DEFAULT_FIELD_NAME)) {
-//                        fieldName = field.getName();
-//                    }
-//                    
-//                    field.setAccessible(true);
-//                    Object obj = field.get(protoSerializable);
-//                    Method setter;
-//                    if (obj instanceof ProtoSerializable) {
-//                        obj = ((ProtoSerializable) obj).serialize();
-//                        setter = findMethod(serializedDataBuilderClass, "set", fieldName, 1);
-//                    } else if (obj instanceof Iterable) {
-//                        obj = toList((Iterable) obj);
-//                        setter = findMethod(serializedDataBuilderClass, "addAll", fieldName, 1);
-//                    } else if (obj instanceof Map) {
-//                        obj = toList((Map) obj);
-//                        setter = findMethod(serializedDataBuilderClass, "addAll", fieldName, 1);
-//                    } else {
-//                        obj = convert(obj);
-//                        setter = findMethod(serializedDataBuilderClass, "set", fieldName, 1);
-//                    }
-//                    
-//                    setter.setAccessible(true);
-//                    setter.invoke(serializedDataBuilder, obj);
-//                }
-//
-//                for (Field field : getMapFields(protoSerializable.getClass())) {
-//                    ProtobufField[] protobufFields = field.getAnnotationsByType(ProtobufField.class);
-//                    ProtobufField keyField = protobufFields[0];
-//                    ProtobufField valueField = protobufFields[1];
-//
-//                    Method keyAdder = findMethod(serializedDataBuilderClass, "add", keyField.name(), 1);
-//                    keyAdder.setAccessible(true);
-//                    Method valueAdder = findMethod(serializedDataBuilderClass, "add", valueField.name(), 1);
-//                    valueAdder.setAccessible(true);
-//                    field.setAccessible(true);
-//
-//                    Map map = (Map) field.get(protoSerializable);
-//                    if(map != null) {
-//                        Set<Map.Entry> entrySet = map.entrySet();
-//                        for (Map.Entry e : entrySet) {
-//                            keyAdder.invoke(serializedDataBuilder, convert(e.getKey()));
-//                            valueAdder.invoke(serializedDataBuilder, convert(e.getValue()));
-//                        }
-//                    }
-//                }
-//
-//                serializedClassBuilderClass.getMethod("setSerializedData", com.google.protobuf.Any.class).invoke(serializedClassBuilder, Any.pack(serializedDataBuilder.build()));
-//            }
-//            return serializedClassBuilder;
-//        } catch (InvocationTargetException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException
-//                | SecurityException e) {
-//            throw new RuntimeException(e);
-//        }
+            try {
+                List<Class<?>> typeParameterTypes = getTypeParameterTypes(ProtoSerializable.class, protoSerializable.getClass());
+                Class<SD> serializedDataClass = (Class<SD>) typeParameterTypes.get(1);
+                B serializedDataBuilder = (B) serializedDataClass.getMethod("newBuilder").invoke(null);
+                Class<SD.Builder> serializedDataBuilderClass = (Class<SD.Builder>) serializedDataBuilder.getClass();
+    
+                for (Field field : getFields(protoSerializable.getClass())) {
+                    ProtobufField protobufField = field.getAnnotation(ProtobufField.class);
+                    String fieldName = protobufField.name();
+                    if (fieldName.equals(ProtobufField.DEFAULT_FIELD_NAME)) {
+                        fieldName = field.getName();
+                    }
+                    
+                    field.setAccessible(true);
+                    Object obj = field.get(protoSerializable);
+                    Method setter;
+                    if (obj instanceof ProtoSerializable) {
+                        obj = ((ProtoSerializable) obj).serialize();
+                        setter = findMethod(serializedDataBuilderClass, "set", fieldName, 1);
+                    } else if (obj instanceof Iterable) {
+                        obj = toList((Iterable) obj);
+                        setter = findMethod(serializedDataBuilderClass, "addAll", fieldName, 1);
+                    } else if (obj instanceof Map) {
+                        obj = toList((Map) obj);
+                        setter = findMethod(serializedDataBuilderClass, "addAll", fieldName, 1);
+                    } else {
+                        obj = convert(obj);
+                        setter = findMethod(serializedDataBuilderClass, "set", fieldName, 1);
+                    }
+                    
+                    setter.setAccessible(true);
+                    setter.invoke(serializedDataBuilder, obj);
+                }
+    
+                for (Field field : getMapFields(protoSerializable.getClass())) {
+                    ProtobufField[] protobufFields = field.getAnnotationsByType(ProtobufField.class);
+                    ProtobufField keyField = protobufFields[0];
+                    ProtobufField valueField = protobufFields[1];
+    
+                    Method keyAdder = findMethod(serializedDataBuilderClass, "add", keyField.name(), 1);
+                    keyAdder.setAccessible(true);
+                    Method valueAdder = findMethod(serializedDataBuilderClass, "add", valueField.name(), 1);
+                    valueAdder.setAccessible(true);
+                    field.setAccessible(true);
+    
+                    Map map = (Map) field.get(protoSerializable);
+                    if(map != null) {
+                        Set<Map.Entry> entrySet = map.entrySet();
+                        for (Map.Entry e : entrySet) {
+                            keyAdder.invoke(serializedDataBuilder, convert(e.getKey()));
+                            valueAdder.invoke(serializedDataBuilder, convert(e.getValue()));
+                        }
+                    }
+                }
+                return serializedDataBuilder;
+            } catch (InvocationTargetException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException
+                | SecurityException e) {
+                throw new RuntimeException(e);
+        }
     }
 
     private static List toList(Iterable iterable) {

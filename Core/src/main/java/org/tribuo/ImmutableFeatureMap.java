@@ -41,12 +41,13 @@ import java.util.stream.Collectors;
  * {@link Example}s and {@link ImmutableFeatureMap}.
  */
 @ProtobufClass(serializedClass = FeatureDomainProto.class, serializedData = ImmutableFeatureMapProto.class)
-public class ImmutableFeatureMap extends FeatureMap implements Serializable {
+public class ImmutableFeatureMap extends FeatureMap<ImmutableFeatureMapProto> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * The map from id numbers to the feature infos.
      */
+//    @ProtobufField(name="info")
     protected final Map<Integer,VariableIDInfo> idMap;
 
     /**

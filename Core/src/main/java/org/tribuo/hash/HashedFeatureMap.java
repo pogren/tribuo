@@ -49,6 +49,10 @@ public final class HashedFeatureMap extends ImmutableFeatureMap {
     @ProtobufField
     private final Hasher hasher;
 
+    private HashedFeatureMap() {
+        hasher = null;
+    }
+    
     private HashedFeatureMap(Hasher hasher) {
         super();
         this.hasher = hasher;

@@ -17,6 +17,9 @@
 package org.tribuo;
 
 import org.tribuo.protos.core.VariableInfoProto;
+import org.tribuo.util.ProtoUtil;
+
+import com.google.protobuf.Message;
 
 import java.io.Serializable;
 import java.util.SplittableRandom;
@@ -25,7 +28,7 @@ import java.util.SplittableRandom;
  * A VariableInfo subclass contains information about a feature and
  * its observed values.
  */
-public interface VariableInfo extends Serializable, ProtoSerializable<VariableInfoProto>, Cloneable {
+public interface VariableInfo<VISD extends Message> extends Serializable, ProtoSerializable<VariableInfoProto, VISD>, Cloneable {
     /**
      * The name of this feature.
      * @return The feature name.
@@ -52,7 +55,7 @@ public interface VariableInfo extends Serializable, ProtoSerializable<VariableIn
      * @param name The new name.
      * @return A VariableInfo subclass with the new name.
      */
-    public VariableInfo rename(String name);
+    public VariableInfo<VISD> rename(String name);
 
     /**
      * Sample a value uniformly from the range of this variable.
@@ -66,5 +69,7 @@ public interface VariableInfo extends Serializable, ProtoSerializable<VariableIn
      * Returns a copy of this variable info.
      * @return A copy.
      */
-    public VariableInfo copy();
+    public VariableInfo<VISD> copy();
+
+    
 }

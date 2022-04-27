@@ -93,6 +93,9 @@ message ModHashCodeHasherProto {
   int32 dimension = 1;
 }
 
+message HashCodeHasherProto {
+}
+
 /*
 SimpleTransform proto
  */

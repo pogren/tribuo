@@ -16,9 +16,11 @@
 
 package org.tribuo;
 
+import org.tribuo.protos.core.VariableInfoProto;
+import org.tribuo.util.ProtoUtil;
+
 import com.google.protobuf.Message;
 import com.oracle.labs.mlrg.olcut.config.protobuf.ProtoProvenanceSerialization;
-import com.oracle.labs.mlrg.olcut.provenance.io.ProvenanceSerialization;
 import com.oracle.labs.mlrg.olcut.util.Pair;
 
 /**
@@ -35,9 +37,9 @@ import com.oracle.labs.mlrg.olcut.util.Pair;
  * <p>
  * If the type being deserialized changes its name then a redirect can be added via
  * {@link org.tribuo.util.ProtoUtil#registerRedirect(Pair, String)}.
- * @param <T> The protobuf type.
+ * @param <M> The protobuf type.
  */
-public interface ProtoSerializable<T extends Message> {
+public interface ProtoSerializable<S extends Message, SD extends Message> {
 
     /**
      * Serializer used for provenance objects.
@@ -48,6 +50,13 @@ public interface ProtoSerializable<T extends Message> {
      * Serializes this object to a protobuf.
      * @return The protobuf
      */
-    public T serialize();
+    default S serialize() {
+        return ProtoUtil.serialize(this);
+    }
+    
+    default SD.Builder subserialize() {
+        return ProtoUtil.subserialize(this);
+    }
 
+    
 }

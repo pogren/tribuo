@@ -19,11 +19,13 @@ package org.tribuo;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import com.google.protobuf.Message;
+
 /**
  * Contains information about a feature and can be stored in the feature map
  * in a {@link Dataset}.
  */
-public abstract class SkeletalVariableInfo implements VariableInfo {
+public abstract class SkeletalVariableInfo<SERD extends Message> implements VariableInfo<SERD> {
     private static final long serialVersionUID = 2L;
 
     private static final Logger logger = Logger.getLogger(SkeletalVariableInfo.class.getName());
@@ -40,6 +42,10 @@ public abstract class SkeletalVariableInfo implements VariableInfo {
     @ProtobufField
     protected int count;
 
+    //used by ProtoUtil.deserialize
+    protected SkeletalVariableInfo() {
+        name = null;
+    }
     /**
      * Constructs a variable info with the supplied name.
      * @param name The feature name.

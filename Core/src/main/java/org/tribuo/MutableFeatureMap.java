@@ -30,8 +30,7 @@ import java.util.stream.Collectors;
 /**
  * A feature map that can record new feature value observations.
  */
-@ProtobufClass(serializedClass = FeatureDomainProto.class, serializedData = MutableFeatureMapProto.class)
-public class MutableFeatureMap extends FeatureMap {
+public class MutableFeatureMap extends FeatureMap<MutableFeatureMapProto> {
     private static final long serialVersionUID = 2L;
 
     @ProtobufField

@@ -18,6 +18,7 @@ package org.tribuo;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.Message;
 import com.oracle.labs.mlrg.olcut.util.MutableLong;
 import org.tribuo.protos.core.CategoricalInfoProto;
 import org.tribuo.protos.core.VariableInfoProto;
@@ -32,7 +33,7 @@ import java.util.Objects;
  * Same as a {@link CategoricalInfo}, but with an additional int id field.
  */
 @ProtobufClass(serializedClass = VariableInfoProto.class, serializedData = CategoricalInfoProto.class)
-public class CategoricalIDInfo extends CategoricalInfo implements VariableIDInfo {
+public class CategoricalIDInfo extends CategoricalInfo implements VariableIDInfo<CategoricalInfoProto> {
     private static final long serialVersionUID = 2L;
 
     @ProtobufField
@@ -166,7 +167,8 @@ public class CategoricalIDInfo extends CategoricalInfo implements VariableIDInfo
     }
 
     @Override
-    public VariableInfoProto serialize() {
-        return ProtoUtil.serialize(this);
+    public CategoricalInfoProto.Builder subserialize() {
+        return ProtoUtil.subserialize(this); 
     }
+
 }

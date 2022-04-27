@@ -33,8 +33,7 @@ import java.util.SplittableRandom;
  * Does not contain an id number, but can be transformed into {@link RealIDInfo} which
  * does contain an id number.
  */
-@ProtobufClass(serializedClass = VariableInfoProto.class, serializedData = RealInfoProto.class)
-public class RealInfo extends SkeletalVariableInfo {
+public class RealInfo extends SkeletalVariableInfo<RealInfoProto> {
     private static final long serialVersionUID = 1L;
 
     @ProtobufField
@@ -64,6 +63,10 @@ public class RealInfo extends SkeletalVariableInfo {
     @ProtobufField
     protected double sumSquares = 0.0;
 
+    
+    //used by ProtoUtil.deserialize
+    protected RealInfo() {}
+    
     /**
      * Creates an empty real info with the supplied name.
      * @param name The feature name.
@@ -119,32 +122,6 @@ public class RealInfo extends SkeletalVariableInfo {
         this.min = other.min;
         this.mean = other.mean;
         this.sumSquares = other.sumSquares;
-    }
-
-    /**
-     * Deserialization factory.
-     * @param version The serialized object version.
-     * @param className The class name.
-     * @param message The serialized data.
-     */
-    public static RealInfo deserializeFromProto(int version, String className, Any message) throws InvalidProtocolBufferException {
-        RealInfoProto proto = message.unpack(RealInfoProto.class);
-        if (proto.getId() != -1) {
-            throw new IllegalStateException("Invalid protobuf, found an id where none was expected. id = " + proto.getId());
-        }
-        if (proto.getMax() < proto.getMin()) {
-            throw new IllegalStateException("Invalid protobuf, min greater than max.");
-        }
-        if (proto.getMean() > proto.getMax()) {
-            throw new IllegalStateException("Invalid protobuf, mean greater than max.");
-        }
-        if (proto.getMean() < proto.getMin()) {
-            throw new IllegalStateException("Invalid protobuf, mean less than min.");
-        }
-        RealInfo info = new RealInfo(proto.getName(),proto.getCount(),
-                proto.getMax(),proto.getMin(),
-                proto.getMean(),proto.getSumSquares());
-        return info;
     }
 
     @Override
@@ -241,8 +218,4 @@ public class RealInfo extends SkeletalVariableInfo {
         return String.format("RealFeature(name=%s,count=%d,max=%f,min=%f,mean=%f,variance=%f)",name,count,max,min,mean,(sumSquares /(count-1)));
     }
 
-    @Override
-    public VariableInfoProto serialize() {
-        return ProtoUtil.serialize(this);
-    }
 }

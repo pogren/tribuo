@@ -15,5 +15,6 @@ public @interface ProtobufField {
     public static final String DEFAULT_FIELD_NAME = "[DEFAULT_FIELD_NAME]";
 
     int sinceVersion() default 0;
-    String name() default DEFAULT_FIELD_NAME; 
+    String name() default DEFAULT_FIELD_NAME;
+    String key() default "";
 }

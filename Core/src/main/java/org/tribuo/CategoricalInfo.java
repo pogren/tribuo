@@ -55,13 +55,10 @@ import com.oracle.labs.mlrg.olcut.util.MutableNumber;
  * </p>
  */
 @ProtobufClass(serializedClass = VariableInfoProto.class, serializedData = CategoricalInfoProto.class)
-public class CategoricalInfo extends SkeletalVariableInfo {
+public class CategoricalInfo extends SkeletalVariableInfo<CategoricalInfoProto> {
     private Object object;
 
     private static final long serialVersionUID = 2L;
-
-    @ProtobufField
-    private final int id = -1;
 
     private static final MutableLong ZERO = new MutableLong(0);
     /**
@@ -465,7 +462,9 @@ public class CategoricalInfo extends SkeletalVariableInfo {
     }
 
     @Override
-    public VariableInfoProto serialize() {
-        return ProtoUtil.serialize(this);
+    public CategoricalInfoProto.Builder subserialize() {
+        CategoricalInfoProto.Builder builder = ProtoUtil.subserialize(this); 
+        builder.setId(-1);
+        return builder;
     }
 }

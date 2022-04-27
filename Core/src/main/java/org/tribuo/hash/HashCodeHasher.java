@@ -23,6 +23,7 @@ import com.oracle.labs.mlrg.olcut.provenance.Provenance;
 import com.oracle.labs.mlrg.olcut.provenance.primitives.StringProvenance;
 
 import org.tribuo.ProtobufClass;
+import org.tribuo.protos.core.HashCodeHasherProto;
 import org.tribuo.protos.core.HasherProto;
 import org.tribuo.protos.core.MessageDigestHasherProto;
 import org.tribuo.util.ProtoUtil;
@@ -36,8 +37,7 @@ import java.util.Objects;
 /**
  * Hashes names using String.hashCode().
  */
-@ProtobufClass(serializedClass = HasherProto.class)
-public final class HashCodeHasher extends Hasher {
+public final class HashCodeHasher extends Hasher<HashCodeHasherProto> {
     private static final long serialVersionUID = 2L;
 
     @Config(mandatory = true, redact = true, description="Salt used in the hash.")
@@ -56,16 +56,6 @@ public final class HashCodeHasher extends Hasher {
      */
     public HashCodeHasher(String salt) {
         this.salt = salt;
-    }
-
-    /**
-     * Deserialization factory.
-     * @param version The serialized object version.
-     * @param className The class name.
-     * @param message The serialized data.
-     */
-    public static HashCodeHasher deserializeFromProto(int version, String className, Any message) {
-        return new HashCodeHasher();
     }
 
     @Override

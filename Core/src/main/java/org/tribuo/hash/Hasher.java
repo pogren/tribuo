@@ -16,19 +16,22 @@
 
 package org.tribuo.hash;
 
+import com.google.protobuf.Message;
+import com.google.protobuf.Message.Builder;
 import com.oracle.labs.mlrg.olcut.config.Configurable;
 import com.oracle.labs.mlrg.olcut.provenance.ConfiguredObjectProvenance;
 import com.oracle.labs.mlrg.olcut.provenance.Provenancable;
 import org.tribuo.ProtoSerializable;
 import org.tribuo.protos.core.HasherProto;
+import org.tribuo.util.ProtoUtil;
 
 import java.io.Serializable;
 
 /**
  * An abstract base class for hash functions used to hash the names of features.
  */
-public abstract class Hasher implements Configurable, Provenancable<ConfiguredObjectProvenance>, Serializable,
-        ProtoSerializable<HasherProto>  {
+public abstract class Hasher<HSD extends Message> implements Configurable, Provenancable<ConfiguredObjectProvenance>, Serializable,
+        ProtoSerializable<HasherProto, HSD>  {
     private static final long serialVersionUID = 2L;
 
     /**
@@ -62,6 +65,16 @@ public abstract class Hasher implements Configurable, Provenancable<ConfiguredOb
      */
     public static boolean validateSalt(String salt) {
         return salt.length() > MIN_LENGTH;
+    }
+
+    @Override
+    public HasherProto serialize() {
+        return ProtoUtil.serialize(this);
+    }
+    
+    @Override
+    public Builder subserialize() {
+        return ProtoUtil.subserialize(this);
     }
 
 }

@@ -19,6 +19,8 @@ package org.tribuo;
 import org.tribuo.protos.core.FeatureDomainProto;
 import org.tribuo.util.ProtoUtil;
 
+import com.google.protobuf.Message;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,13 +33,13 @@ import java.util.TreeMap;
  * A map from Strings to {@link VariableInfo} objects storing
  * information about a feature.
  */
-public abstract class FeatureMap implements Serializable, ProtoSerializable<FeatureDomainProto>, Iterable<VariableInfo> {
+public abstract class FeatureMap<VISD extends Message> implements Serializable, ProtoSerializable<FeatureDomainProto, VISD>, Iterable<VariableInfo> {
     private static final long serialVersionUID = 1L;
 
     /**
      * Map from the feature names to their info.
      */
-    @ProtobufField(name="info")
+    @ProtobufField(name="info", key="name")
     protected final Map<String, VariableInfo> m;
 
     /**
@@ -51,7 +53,7 @@ public abstract class FeatureMap implements Serializable, ProtoSerializable<Feat
      * Constructs a deep copy of the supplied feature map.
      * @param map The map to copy.
      */
-    protected FeatureMap(FeatureMap map) {
+    protected FeatureMap(FeatureMap<VISD> map) {
         m = new HashMap<>();
         for (Map.Entry<String,VariableInfo> e : map.m.entrySet()) {
             VariableInfo info = e.getValue().copy();

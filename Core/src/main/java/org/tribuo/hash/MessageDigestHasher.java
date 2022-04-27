@@ -18,6 +18,7 @@ package org.tribuo.hash;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.Message.Builder;
 import com.oracle.labs.mlrg.olcut.config.Config;
 import com.oracle.labs.mlrg.olcut.config.PropertyException;
 import com.oracle.labs.mlrg.olcut.provenance.ConfiguredObjectProvenance;
@@ -30,6 +31,7 @@ import org.tribuo.ProtobufField;
 import org.tribuo.protos.core.HasherProto;
 import org.tribuo.protos.core.MessageDigestHasherProto;
 import org.tribuo.protos.core.ModHashCodeHasherProto;
+import org.tribuo.util.ProtoUtil;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -47,8 +49,7 @@ import java.util.function.Supplier;
 /**
  * Hashes Strings using the supplied MessageDigest type.
  */
-@ProtobufClass(serializedClass = HasherProto.class, serializedData = MessageDigestHasherProto.class)
-public final class MessageDigestHasher extends Hasher {
+public final class MessageDigestHasher extends Hasher<MessageDigestHasherProto> {
     private static final long serialVersionUID = 3L;
 
     /**
@@ -101,6 +102,7 @@ public final class MessageDigestHasher extends Hasher {
      * @throws InvalidProtocolBufferException If the message cannot be parsed by {@link MessageDigestHasherProto}.
      */
     public static MessageDigestHasher deserializeFromProto(int version, String className, Any message) throws InvalidProtocolBufferException {
+        System.out.println("MessageDigestHasher.deserializeFromProto ");
         MessageDigestHasher obj = new MessageDigestHasher();
         MessageDigestHasherProto proto = message.unpack(MessageDigestHasherProto.class);
         obj.hashType = proto.getHashType();
@@ -195,14 +197,6 @@ public final class MessageDigestHasher extends Hasher {
         return () -> { try { return MessageDigest.getInstance(hashType); } catch (NoSuchAlgorithmException e) { throw new IllegalArgumentException("Unsupported hashType = " + hashType,e);}};
     }
 
-    @Override
-    public HasherProto serialize() {
-        HasherProto.Builder builder = HasherProto.newBuilder();
-        builder.setVersion(0);
-        builder.setClassName(this.getClass().getName());
-        builder.setSerializedData(Any.pack(MessageDigestHasherProto.newBuilder().setHashType(hashType).build()));
-        return builder.build();
-    }
 
     /**
      * Provenance for {@link MessageDigestHasher}.

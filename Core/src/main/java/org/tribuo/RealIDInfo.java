@@ -30,12 +30,17 @@ import java.util.Objects;
  * Same as a {@link RealInfo}, but with an additional int id field.
  */
 @ProtobufClass(serializedClass = VariableInfoProto.class, serializedData = RealInfoProto.class)
-public class RealIDInfo extends RealInfo implements VariableIDInfo {
+public class RealIDInfo extends RealInfo implements VariableIDInfo<RealInfoProto> {
     private static final long serialVersionUID = 1L;
 
     @ProtobufField
     private final int id;
 
+    //used by ProtoUtil.deserialize
+    private RealIDInfo() {
+        this.id = -1;
+    }
+    
     /**
      * Constructs a real id info from the supplied arguments.
      * @param name The feature name.
@@ -69,33 +74,6 @@ public class RealIDInfo extends RealInfo implements VariableIDInfo {
     private RealIDInfo(RealIDInfo info, String newName) {
         super(info,newName);
         this.id = info.id;
-    }
-
-    /**
-     * Deserialization factory.
-     * @param version The serialized object version.
-     * @param className The class name.
-     * @param message The serialized data.
-     */
-    public static RealIDInfo deserializeFromProto(int version, String className, Any message) throws InvalidProtocolBufferException {
-        RealInfoProto proto = message.unpack(RealInfoProto.class);
-        if (proto.getId() == -1) {
-            throw new IllegalStateException("Invalid protobuf, found no id where one was expected.");
-        }
-        if (proto.getMax() < proto.getMin()) {
-            throw new IllegalStateException("Invalid protobuf, min greater than max.");
-        }
-        if (proto.getMean() > proto.getMax()) {
-            throw new IllegalStateException("Invalid protobuf, mean greater than max.");
-        }
-        if (proto.getMean() < proto.getMin()) {
-            throw new IllegalStateException("Invalid protobuf, mean less than min.");
-        }
-        RealIDInfo info = new RealIDInfo(proto.getName(),proto.getCount(),
-                proto.getMax(),proto.getMin(),
-                proto.getMean(),proto.getSumSquares(),
-                proto.getId());
-        return info;
     }
 
     @Override

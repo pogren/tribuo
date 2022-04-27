@@ -16,10 +16,12 @@
 
 package org.tribuo;
 
+import com.google.protobuf.Message;
+
 /**
  * Adds an id number to a {@link VariableInfo}.
  */
-public interface VariableIDInfo extends VariableInfo {
+public interface VariableIDInfo<VISD extends Message> extends VariableInfo<VISD> {
 
     /**
      * The id number associated with this variable.
