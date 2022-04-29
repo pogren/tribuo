@@ -118,11 +118,6 @@ public final class HashCodeHasher extends Hasher {
         salt = null;
     }
 
-    @Override
-    public HasherProto serialize() {
-        return ProtoUtil.serialize(this);
-    }
-
     /**
      * Provenance for the {@link HashCodeHasher}.
      */
