@@ -16,22 +16,21 @@
 
 package org.tribuo.hash;
 
-import com.google.protobuf.Any;
-import com.oracle.labs.mlrg.olcut.config.Config;
-import com.oracle.labs.mlrg.olcut.provenance.ConfiguredObjectProvenance;
-import com.oracle.labs.mlrg.olcut.provenance.Provenance;
-import com.oracle.labs.mlrg.olcut.provenance.primitives.StringProvenance;
-
-import org.tribuo.protos.core.HasherProto;
-import org.tribuo.protos.core.MessageDigestHasherProto;
-import org.tribuo.protos.ProtoSerializableClass;
-import org.tribuo.protos.ProtoUtil;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+
+import org.tribuo.protos.ProtoSerializableClass;
+import org.tribuo.protos.ProtoUtil;
+import org.tribuo.protos.core.HasherProto;
+
+import com.google.protobuf.Any;
+import com.oracle.labs.mlrg.olcut.config.Config;
+import com.oracle.labs.mlrg.olcut.provenance.ConfiguredObjectProvenance;
+import com.oracle.labs.mlrg.olcut.provenance.Provenance;
+import com.oracle.labs.mlrg.olcut.provenance.primitives.StringProvenance;
 
 /**
  * Hashes names using String.hashCode().
@@ -68,6 +67,12 @@ public final class HashCodeHasher extends Hasher {
         return new HashCodeHasher();
     }
 
+    @Override
+    public HasherProto serialize() {
+        return ProtoUtil.serialize(this);
+    }
+
+    
     @Override
     public String hash(String name) {
         if (salt == null) {
