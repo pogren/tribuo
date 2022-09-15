@@ -23,6 +23,7 @@ import com.oracle.labs.mlrg.olcut.util.SortUtil;
 import org.tribuo.Output;
 import org.tribuo.OutputInfo;
 import org.tribuo.protos.core.OutputProto;
+import org.tribuo.regression.protos.DimensionTupleProto;
 import org.tribuo.regression.protos.RegressorProto;
 import org.tribuo.util.Util;
 
@@ -569,6 +570,20 @@ public class Regressor implements Output<Regressor>, Iterable<Regressor.Dimensio
             this(name,value,Double.NaN);
         }
 
+        /**
+         * Deserialization factory.
+         * @param version The serialized object version.
+         * @param className The class name.
+         * @param message The serialized data.
+         */
+        public static DimensionTuple deserializeFromProto(int version, String className, Any message) throws InvalidProtocolBufferException {
+            if (version < 0 || version > 0) {
+                throw new IllegalArgumentException("Unknown version " + version + ", this class supports at most version " + 0);
+            }
+            DimensionTupleProto proto = message.unpack(DimensionTupleProto.class);
+            return new DimensionTuple(proto.getName(),proto.getValue(),proto.getVariance());
+        }
+
         @Override
         public int size() {
             return 1;
@@ -679,6 +694,24 @@ public class Regressor implements Output<Regressor>, Iterable<Regressor.Dimensio
         public String getDimensionNamesString() {
             return name;
         }
+
+        @Override
+        public OutputProto serialize() {
+            OutputProto.Builder outputBuilder = OutputProto.newBuilder();
+
+            outputBuilder.setClassName(DimensionTuple.class.getName());
+            outputBuilder.setVersion(0);
+
+            DimensionTupleProto.Builder data = DimensionTupleProto.newBuilder();
+            data.setName(name);
+            data.setValue(value);
+            data.setVariance(variance);
+
+            outputBuilder.setSerializedData(Any.pack(data.build()));
+
+            return outputBuilder.build();
+        }
+
     }
 
     private class RegressorIterator implements Iterator<DimensionTuple> {
